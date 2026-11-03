@@ -4,7 +4,18 @@
 
 Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 AI 怎么修改，确认后再放进其他应用的输入框。
 
-**[下载安装包](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)**
+## 直接下载 · 0.1.32 测试版
+
+| 电脑 | 点击下载 | 下载后怎么打开 |
+|---|---|---|
+| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.32-test/TalkMan-Windows-Portable-0.1.32.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
+| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.32-test/TalkMan-Mac-AppleSilicon-0.1.32-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
+
+下载不需要 GitHub 账号。**分享给朋友时，直接发送本页地址：<https://github.com/stevewudongyue-rgb/TalkMan-Desktop>**，也可以复制上方对应电脑的下载链接。
+
+[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.32-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
+
+在版本页面往下找到 **Assets（附件）**，点击以 `TalkMan-Windows` 或 `TalkMan-Mac` 开头的文件。GitHub 的 `Code → Download ZIP` 和 `Source code` 下载项只包含本仓库的说明文件，不是应用安装包。
 
 本仓库仅提供安装包、使用说明和问题反馈。
 
