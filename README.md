@@ -4,18 +4,18 @@
 
 Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 AI 怎么修改，确认后再放进其他应用的输入框。
 
-## 直接下载 · 0.1.32 测试版
+## 直接下载 · 0.1.33 测试版
 
 **[早期体验：领取 10 枚一年高级功能兑换码](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.32-test)**。兑换码位于发布说明顶部，每码限 1 台设备，先到先得；授权从 2026-11-03 发放时起算，至 2027-11-03 到期，不包含模型调用额度。
 
 | 电脑 | 点击下载 | 下载后怎么打开 |
 |---|---|---|
-| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.32-test/TalkMan-Windows-Portable-0.1.32.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
-| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.32-test/TalkMan-Mac-AppleSilicon-0.1.32-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
+| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.33-test/TalkMan-Windows-Portable-0.1.33.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
+| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.33-test/TalkMan-Mac-AppleSilicon-0.1.33-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
 
 下载不需要 GitHub 账号。**分享给朋友时，直接发送本页地址：<https://github.com/stevewudongyue-rgb/TalkMan-Desktop>**，也可以复制上方对应电脑的下载链接。
 
-[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.32-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
+[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.33-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
 
 在版本页面往下找到 **Assets（附件）**，点击以 `TalkMan-Windows` 或 `TalkMan-Mac` 开头的文件。GitHub 的 `Code → Download ZIP` 和 `Source code` 下载项只包含本仓库的说明文件，不是应用安装包。
 
@@ -27,7 +27,7 @@ Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 A
 |---|---|---|
 | 录音、选区覆盖、语音指令修改、AI 整理 | ✓ | ✓ |
 | 编辑、撤销、复制、填入 Agent／二次下发 | ✓ | ✓ |
-| 退出后保留当前正文 | ✓ | ✓ |
+| 退出后保留当前正文、在线升级 | ✓ | ✓ |
 | 草稿簿、投递历史 | — | ✓ |
 | 约定词、纠正学习、代码口述 | — | ✓ |
 | 选区翻译 | — | ✓ |
@@ -40,6 +40,12 @@ Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 A
 - **Apple 芯片 Mac，macOS 14 及以上**：打开 DMG，把 TalkMan 拖到“应用程序”，再从那里运行。当前为未公证测试版，首次可能被系统拦截；确认来源后，在“系统设置 → 隐私与安全性”查看“仍要打开”。不需要关闭系统安全保护。
 - 进入设置连接语音识别模型、文字改写模型。按“录音和覆盖”说话；选中一段后可直接覆盖或下达修改指令。选择目标后，“填入 Agent”只放进输入框，再次点击“下发”才发送。
 - 首次录音允许麦克风。Mac 填入其他应用需辅助功能授权，可在应用的“Mac 授权”页检查。不同目标应用的兼容性可能有差异。
+
+## 在线升级
+
+从 0.1.33 起，打开 **设置 → 版本 → 检查更新**，下载完成后点击 **保存并重启升级**。支持 Windows 完整便携目录和 Apple 芯片 Mac，草稿、模型 Key 和授权保留。启动时默认检查新版，只提醒，不自动安装；可在版本页关闭。
+
+0.1.32 及更早版本需先从上方下载安装 0.1.33。若 GitHub 暂时无法访问，检查或下载会提示重试，当前程序仍可继续使用。Mac 请先把应用放入“应用程序”；当前仍为未公证测试版，系统可能要求重新确认权限。
 
 ## 使用边界
 
