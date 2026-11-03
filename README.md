@@ -6,7 +6,7 @@ Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 A
 
 **[下载安装包](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)**
 
-本仓库仅提供安装包、使用说明和问题反馈。**软件闭源，源码不在本仓库；公开下载不代表开源。**
+本仓库仅提供安装包、使用说明和问题反馈。
 
 ## 两种使用方式
 
