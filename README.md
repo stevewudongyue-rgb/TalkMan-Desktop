@@ -4,24 +4,24 @@
 
 Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 AI 怎么修改，确认后再放进其他应用的输入框。
 
-## 直接下载 · 0.1.37 测试版
+## 直接下载 · 0.1.36 测试版
 
 **[早期体验：领取 10 枚一年高级功能兑换码](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.32-test)**。兑换码位于发布说明顶部，每码限 1 台设备，先到先得；授权从 2026-11-03 发放时起算，至 2027-11-03 到期，不包含模型调用额度。
 
 | 电脑 | 点击下载 | 下载后怎么打开 |
 |---|---|---|
-| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.37-test/TalkMan-Windows-Portable-0.1.37.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
-| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.37-test/TalkMan-Mac-AppleSilicon-0.1.37-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
+| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.36-test/TalkMan-Windows-Portable-0.1.36.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
+| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.36-test/TalkMan-Mac-AppleSilicon-0.1.36-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
 
 下载不需要 GitHub 账号。**分享给朋友时，直接发送本页地址：<https://github.com/stevewudongyue-rgb/TalkMan-Desktop>**，也可以复制上方对应电脑的下载链接。
 
-[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.37-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
+[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.36-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
 
 在版本页面往下找到 **Assets（附件）**，点击以 `TalkMan-Windows` 或 `TalkMan-Mac` 开头的文件。GitHub 的 `Code → Download ZIP` 和 `Source code` 下载项只包含本仓库的说明文件，不是应用安装包。
 
 本仓库仅提供安装包、使用说明和问题反馈。
 
-**0.1.37 更新：** 切换对话后重新识别已支持的唯一主消息框；选择位置时主窗口暂时让开，确认后恢复。强化瑞士外观，点击图标轮换三种主题；高级版默认收起兑换码表单。
+**0.1.36 更新：** 修正 Windows 竖屏红框、稳定录音布局；增加无需误写的 AI 优先词、瑞士国际外观及更完整的指令引导。设置页自动换行，升级沿用配置，老用户不再重走引导。
 
 **新版语音指令：** 同一个「指令修改」按钮可改文字、存草稿、开关 AI、修改快捷键、选择输入位置。自然表达由已连接的文字模型理解；不清楚时在原窗口追问，可以继续说或点选，再确认执行。模型可能理解错，请核对操作提示。
 
@@ -53,7 +53,7 @@ Mac 的红色关闭按钮只关闭窗口并保存正文，应用继续在后台�
 
 从 0.1.33 起，打开 **设置 → 版本 → 检查更新**，下载完成后点击 **保存并重启升级**。支持 Windows 完整便携目录和 Apple 芯片 Mac，正文、草稿、已记住的 Key、授权、快捷键和外观保留。启动时默认检查新版，只提醒，不自动安装；可在版本页关闭。
 
-从 0.1.37 发起后续升级时，还会保存光标、选区和阅读位置；老用户不重复走新手引导。没有选择记住的 Key 仍只在本次运行中使用。Mac 保持原安装位置和应用标识；正式签名安装会核对新版签名身份，当前测试包仍可能触发系统重新授权。
+从 0.1.36 发起后续升级时，还会保存光标、选区和阅读位置；老用户不重复走新手引导。没有选择记住的 Key 仍只在本次运行中使用。Mac 保持原安装位置和应用标识；正式签名安装会核对新版签名身份，当前测试包仍可能触发系统重新授权。
 
 0.1.32 及更早版本需先从上方下载安装最新版。若 GitHub 暂时无法访问，检查或下载会提示重试，当前程序仍可继续使用。Mac 请先把应用放入“应用程序”；当前仍为未公证测试版，系统可能要求重新确认权限。
 
