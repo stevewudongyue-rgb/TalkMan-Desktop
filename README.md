@@ -4,22 +4,26 @@
 
 Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 AI 怎么修改，确认后再放进其他应用的输入框。
 
-## 直接下载 · 0.1.34 测试版
+## 直接下载 · 0.1.35 测试版
 
 **[早期体验：领取 10 枚一年高级功能兑换码](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.32-test)**。兑换码位于发布说明顶部，每码限 1 台设备，先到先得；授权从 2026-11-03 发放时起算，至 2027-11-03 到期，不包含模型调用额度。
 
 | 电脑 | 点击下载 | 下载后怎么打开 |
 |---|---|---|
-| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.34-test/TalkMan-Windows-Portable-0.1.34.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
-| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.34-test/TalkMan-Mac-AppleSilicon-0.1.34-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
+| Windows 10／11，64 位 | **[下载 Windows 版（ZIP，约 33 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.35-test/TalkMan-Windows-Portable-0.1.35.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
+| Apple 芯片 Mac，macOS 14 及以上 | **[下载 Mac 版（DMG，约 21 MB）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.35-test/TalkMan-Mac-AppleSilicon-0.1.35-test.dmg)** | 打开 DMG，将 TalkMan 拖到“应用程序”，再从那里运行。 |
 
 下载不需要 GitHub 账号。**分享给朋友时，直接发送本页地址：<https://github.com/stevewudongyue-rgb/TalkMan-Desktop>**，也可以复制上方对应电脑的下载链接。
 
-[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.34-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
+[查看版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.35-test) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
 
 在版本页面往下找到 **Assets（附件）**，点击以 `TalkMan-Windows` 或 `TalkMan-Mac` 开头的文件。GitHub 的 `Code → Download ZIP` 和 `Source code` 下载项只包含本仓库的说明文件，不是应用安装包。
 
 本仓库仅提供安装包、使用说明和问题反馈。
+
+**新版语音指令：** 同一个「指令修改」按钮可改文字、存草稿、开关 AI、修改快捷键、选择输入位置。自然表达由已连接的文字模型理解；不清楚时在原窗口追问，可以继续说或点选，再确认执行。模型可能理解错，请核对操作提示。
+
+[查看完整功能与自然说法清单](TalkMan-语音指令清单.md)。目标旁的「输入位置」可逐个编号、高亮同一 Agent 内的输入框；未知表单只填入，不自动猜测回车提交。
 
 ## 两种使用方式
 
