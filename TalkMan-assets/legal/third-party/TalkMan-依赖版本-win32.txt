@@ -1,0 +1,14 @@
+altgraph 0.17.5：1 份许可／声明
+certifi 2026.2.25：1 份许可／声明
+cffi 2.1.1：1 份许可／声明
+comtypes 1.4.16：1 份许可／声明
+cryptography 50.0.2：3 份许可／声明
+packaging 26.3：3 份许可／声明
+pefile 2024.8.26：1 份许可／声明
+pycparser 3.1：1 份许可／声明
+pyinstaller 6.22.3：1 份许可／声明
+pyinstaller-hooks-contrib 2026.8：1 份许可／声明
+pywin32-ctypes 0.2.3：1 份许可／声明
+setuptools 84.0.0：17 份许可／声明
+sounddevice 0.5.6：1 份许可／声明
+websocket-client 1.9.2：1 份许可／声明

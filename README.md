@@ -1,67 +1,87 @@
-# Talk Man Desktop
+# TALKMAN Desktop
 
-把话说出来，改好再发。
+**把话说出来，改好再发。**
 
-Talk Man 是桌面上的预输入工具：录音变成文字，用语音告诉 AI 怎么修改，确认后再放进其他应用的输入框。
+TALKMAN 是 Windows 和 Mac 上的语音预输入工具：说话生成文字，用自然语言修改，检查后填入其他应用的输入框。本仓库公开桌面端完整源码与安装包，采用 [Apache License 2.0](LICENSE)。所有随版本提供的功能均直接开放，无需兑换码或账号激活。
 
-## 直接下载 · 0.1.43 公开开源版
+## 下载 · 0.1.43（构建 44）
 
-这是 TalkMan Desktop 的公开开源发布页。当前版本直接提供完整的录音、编辑、AI 整理、草稿簿、历史、约定词、翻译和 Agent 填入功能。源码与构建说明见 [公开源码仓库](https://github.com/stevewudongyue-rgb/Talkman/tree/DESKTOP)。
-
-| 电脑 | 点击下载 | 下载后怎么打开 |
-|---|---|---|
-| Windows 10／11，64 位 | **[下载 Windows 版（ZIP）](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.43-open/TalkMan-Windows-Portable-0.1.43.zip)** | 完整解压，打开文件夹里的 `TalkMan.exe`；保留 `_internal` 文件夹。 |
-| Apple 芯片 Mac，macOS 14 及以上 | **Mac 版待公司 M2 编译验证** | 验证后会附加到同一公开 Release；源码可先按说明构建。 |
-
-下载不需要 GitHub 账号。**分享给朋友时，直接发送本页地址：<https://github.com/stevewudongyue-rgb/TalkMan-Desktop>**，也可以复制上方对应电脑的下载链接。
-
-[查看 0.1.43 版本说明和下载附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.43-open) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases)
-
-在版本页面往下找到 **Assets（附件）**，点击以 `TalkMan-Windows` 或 `TalkMan-Mac` 开头的文件。GitHub 的 `Code → Download ZIP` 和 `Source code` 下载项只包含本仓库的说明文件，不是应用安装包。
-
-本仓库仅提供安装包、使用说明和问题反馈。
-
-**0.1.43 更新：** 统一为完整功能公开开源版，采用 Apache License 2.0。去客气表达、说话人角色、草稿簿、投递历史、约定词、翻译、AI 整理和 Agent 填入均可直接使用；模型 Key 由使用者自行配置。
-
-**新版语音指令：** 同一个「指令修改」按钮可改文字、存草稿、开关 AI、修改快捷键、选择输入位置。自然表达由已连接的文字模型理解；不清楚时在原窗口追问，可以继续说或点选，再确认执行。模型可能理解错，请核对操作提示。
-
-[查看完整功能与自然说法清单](TalkMan-语音指令清单.md)。目标旁的「输入位置」可逐个编号、高亮同一 Agent 内的输入框；未知表单只填入，不自动猜测回车提交。
-
-## 两种使用方式
-
-| 功能 | 公开版 |
+| 电脑 | 下载与运行 |
 |---|---|
-| 录音、选区覆盖、语音指令修改、AI 整理、说话人角色 | ✓ |
-| 编辑、撤销、复制、填入 Agent／二次下发 | ✓ |
-| 退出后保留当前正文、在线升级 | ✓ |
-| 草稿簿、投递历史、约定词、纠正学习、代码口述 | ✓ |
-| 选区翻译 | ✓ |
+| Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.43/TalkMan-Windows-Portable-0.1.43.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
+| Apple 芯片 Mac | 本轮 0.1.43 安装包待公司 M2 原生编译验证；可按下方说明自行构建。 |
 
-安装包直接提供完整功能。你可以连接自己的模型 Key，也可以使用项目提供的免费在线服务（如仍在服务期内）。语音和文字处理的费用、额度及可用性由相应服务商决定；安装包不内置供应商 Key。
+[本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.43) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
 
-## 安装与开始
+分享下载直接发送本页地址：**https://github.com/stevewudongyue-rgb/TalkMan-Desktop**。下载无需 GitHub 账号。`Code → Download ZIP` 和发布页的 `Source code` 是源码；运行程序请下载上表中的安装包。
 
-- **Windows 10／11，64 位**：完整解压便携 ZIP，打开其中的 `TalkMan.exe`。请保留相邻的 `_internal` 文件夹，不能只复制 EXE。此测试版尚未提供 Windows 商业代码签名。
-- **Apple 芯片 Mac，macOS 14 及以上**：打开 DMG，把 TalkMan 拖到“应用程序”，再从那里运行。当前为未公证测试版，首次可能被系统拦截；确认来源后，在“系统设置 → 隐私与安全性”查看“仍要打开”。不需要关闭系统安全保护。
-- 进入设置连接语音识别模型、文字改写模型。按“录音和覆盖”说话；选中一段后可直接覆盖或下达修改指令。选择目标后，“填入 Agent”只放进输入框，再次点击“下发”才发送。
-- 首次录音允许麦克风。Mac 填入其他应用需辅助功能权限，可在应用的“Mac 权限”页检查。不同目标应用的兼容性可能有差异。
+## 能做什么
 
-Mac 的红色关闭按钮只关闭窗口并保存正文，应用继续在后台运行。点击 Dock 图标或菜单栏“打开 Talk Man”可恢复；“退出 Talk Man”（⌘Q）才结束应用。设置会以独立窗口打开，切换项目时保持窗口大小。
+- **录音和覆盖：** 没有选区就在光标处输入，有选区就替换所选文字。支持点按启停、按住录音和自定义快捷键。
+- **语音指令：** 说“把这句改得简短一些”“把这一段移到最后”，也可保存草稿、切换 AI 设置或记住约定词。需要确认时，在原窗口继续选择或回答。
+- **AI 整理与翻译：** 去语气词、补标点、分行、理顺语序；可先看改写对照，确认后应用。翻译只处理选中文字。
+- **草稿、历史和约定词：** 保存文本、查看投递记录、导出 TXT，记住专名及容易听错的词。
+- **填入 Agent：** 选择目标窗口后，把文字放进它的输入框。确认填入成功后，再点“下发”才发送；无法核对时保留正文。支持窗口置顶、边缘收起和快捷唤起。
+
+详细操作及自然说法见 [语音指令清单](TalkMan-语音指令清单.md)。不同应用的输入框兼容性可能不同。
+
+## 第一次使用
+
+1. 在设置中连接**语音识别模型**与**文字改写模型**。支持千问及其他已接入服务；需要自己的服务凭证。
+2. 点击“录音和覆盖”说话，停止后检查文字；选中文字后可用“指令修改”。
+3. 选择目标应用，点击“填入 Agent”；核对后再次点击“下发”。
+
+软件本身免费，模型服务的费用与额度由服务商决定。已有免费在线内测连接可继续使用，但受服务方策略、额度和网络影响，可能暂停或不可用；公开安装包不附带供应商 Key 或免费内测凭证。
+
+录音需要麦克风权限；Mac 填入其他应用需要辅助功能权限。当前分发包尚未商业签名／公证，系统可能提示确认来源。Mac 红色关闭按钮关闭窗口，`⌘Q` 才退出应用。
 
 ## 在线升级
 
-从 0.1.33 起，打开 **设置 → 版本 → 检查更新**，下载完成后点击 **保存并重启升级**。支持 Windows 完整便携目录和 Apple 芯片 Mac，正文、草稿、已记住的 Key、授权、快捷键和外观保留。启动时默认检查新版，只提醒，不自动安装；可在版本页关闭。
+打开 **设置 → 版本 → 检查更新**，下载后选择“保存并重启升级”。正文、草稿、已记住的 Key、快捷键和外观保留。启动检查只提醒，不自动安装。0.1.32 及以前版本需要先手动安装一次新版。
 
-从 0.1.36 发起后续升级时，还会保存光标、选区和阅读位置；老用户不重复走新手引导。没有选择记住的 Key 仍只在本次运行中使用。Mac 保持原安装位置和应用标识；正式签名安装会核对新版签名身份，当前测试包仍可能触发系统重新授权。
+## 从源码运行与构建
 
-0.1.32 及更早版本需先从上方下载安装最新版。若 GitHub 暂时无法访问，检查或下载会提示重试，当前程序仍可继续使用。Mac 请先把应用放入“应用程序”；当前仍为未公证测试版，系统可能要求重新确认权限。
+安装含 Tcl/Tk 的 Python 3.12 或 3.13。在本仓库根目录运行：
 
-## 使用边界
+```sh
+python -m pip install -r TalkMan-requirements.txt
+python talkman_app.py
+```
 
-软件按 Apache License 2.0 发布。你可以使用、修改、再分发源码和构建产物，并按许可证要求保留版权与许可声明；模型服务、商标、第三方组件及其数据政策仍按各自条款执行。
+Mac 使用 `python3`。源码运行仍需自己的模型凭证和系统权限。
 
-[软件使用协议](TalkMan-软件使用协议.md) · [隐私说明](TalkMan-隐私说明.md) · [第三方组件](TalkMan-第三方组件说明.md) · [版本记录](TalkMan-版本记录.md)
+**Windows 便携包：**
+
+```powershell
+python -m pip install --target TalkMan-libs -r TalkMan-requirements.txt pyinstaller==6.22.3
+powershell -ExecutionPolicy Bypass -File .\build_windows.ps1
+```
+
+输出在 `dist-desktop/TalkMan/`，请分发整个文件夹。构建脚本会收集运行依赖、图标和第三方许可。
+
+**Apple 芯片 Mac：** 在 Mac 上安装 python.org 的 Python，再运行：
+
+```sh
+bash TalkMan-构建Mac.command
+```
+
+脚本准备依赖并构建应用和 DMG。目标最低系统为 macOS 14；各系统的实际兼容性需要在对应设备验收。公司 M2 优先构建，GitHub Actions 不会自动启动编译。正式分发的签名、公证需维护者自备 Apple Developer ID。
+
+**验证：**
+
+```sh
+python -m unittest test_talkman_license test_talkman_updates test_talkman_update_ui -q
+python TalkMan-构建Mac.py --check
+```
+
+涉及界面的测试需要桌面图形环境。完整测试见 `test_talkman_*.py`；测试使用临时数据和模拟模型，不代表真实麦克风及所有目标应用均已验收。
+
+## 许可与反馈
+
+源码及构建产物采用 **Apache License 2.0**，允许使用、修改、商用与再分发，并须遵守版权及许可保留要求。商标与 Logo 不随代码许可授予；字体、图标和依赖遵守各自许可。本仓库的开源范围仅为桌面端。
+
+[许可证全文](LICENSE) · [软件说明](TalkMan-软件使用协议.md) · [隐私说明](TalkMan-隐私说明.md) · [第三方组件](TalkMan-第三方组件说明.md)
 
 版权所有：杭州行至云起科技有限公司；项目负责人：吴冬悦。
 
-问题可在本仓库 Issues 提交，请附系统版本、Talk Man 版本和操作步骤。不要公开 API Key 或私密正文。
+问题请提交到 [Issues](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/issues)，附系统版本、软件版本与操作步骤。不要公开 API Key、密码、录音或私密正文。
