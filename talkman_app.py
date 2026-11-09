@@ -1121,16 +1121,29 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         content.columnconfigure(2,weight=1,uniform='records')
         listing = ttk.Frame(content,style="Panel.TFrame")
         listing.grid(row=0,column=0,sticky="nsew")
-        listing.rowconfigure(0,weight=1)
+        listing.rowconfigure(1,weight=1)
         listing.columnconfigure(0,weight=1)
-        self.history_list = ttk.Treeview(listing,show="tree",height=5,selectmode="browse",takefocus=True,
+        self.record_bulk_select = False
+        selection_tools = ttk.Frame(listing, style='Panel.TFrame')
+        selection_tools.grid(row=0, column=0, columnspan=2, sticky='ew', pady=(0, 6))
+        self.history_multi_button = self.button(selection_tools, '多选', self.toggle_record_multiselect,
+                                                style='PanelGhost.TButton')
+        self.history_multi_button.pack(side='left')
+        self.history_select_all_button = self.button(selection_tools, '全选', self.select_all_records,
+                                                     style='PanelGhost.TButton')
+        self.hover_help.attach(self.history_multi_button, '一次选择多条记录，统一删除。也可按住 Ctrl 或 Command 多选、Shift 连选。')
+        self.history_list = ttk.Treeview(listing,show="tree",height=5,selectmode="extended",takefocus=True,
                                          style='Records.Treeview')
         self.history_list.column("#0",width=200,minwidth=120,stretch=True)
         self.history_list.tag_configure('alternate', background=COLORS['bg'])
         self.history_list.bind('<Configure>', self.reflow_history_labels)
-        self.history_list.grid(row=0,column=0,sticky="nsew")
+        self.history_list.grid(row=1,column=0,sticky="nsew")
+        self.history_list.bind('<Button-1>', self.record_selection_click)
+        self.history_list.bind('<Control-a>', self.select_all_records)
+        if sys.platform == 'darwin':
+            self.history_list.bind('<Command-a>', self.select_all_records)
         hs = AutoHideScrollbar(listing,command=self.history_list.yview)
-        hs.grid(row=0,column=1,sticky="ns")
+        hs.grid(row=1,column=1,sticky="ns")
         self.history_list.configure(yscrollcommand=hs.set)
         self.history_list.bind("<<TreeviewSelect>>",self.preview_history)
         ttk.Separator(content, orient='vertical').grid(row=0,column=1,sticky='ns',padx=12)
@@ -1194,6 +1207,36 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
     def remember_record_view(self):
         selected = self.history_list.selection()
         self.record_views[self.record_mode] = (selected[0] if selected else None, self.history_list.yview()[0], self.preview_widget.yview()[0])
+
+    def toggle_record_multiselect(self):
+        self.record_bulk_select = not self.record_bulk_select
+        self.history_multi_button.configure(text='退出多选' if self.record_bulk_select else '多选')
+        if self.record_bulk_select:
+            self.history_select_all_button.pack(side='left', padx=(6, 0))
+        else:
+            self.history_select_all_button.pack_forget()
+        self.cancel_history()
+        self.reflow_history_labels()
+        self.history_status.set('点击记录勾选，选好后点「删除」。' if self.record_bulk_select else '选择一条记录，查看全文。')
+
+    def record_selection_click(self, event):
+        if not self.record_bulk_select:
+            return
+        identifier = self.history_list.identify_row(event.y)
+        if identifier:
+            self.history_list.focus_set()
+            self.history_list.focus(identifier)
+            if identifier in self.history_list.selection():
+                self.history_list.selection_remove(identifier)
+            else:
+                self.history_list.selection_add(identifier)
+            self.preview_history()
+        return 'break'
+
+    def select_all_records(self, _event=None):
+        self.history_list.selection_set(self.history_list.get_children())
+        self.preview_history()
+        return 'break'
 
     def toggle_deliveries(self):
         if self.history_open and self.record_mode == "delivery":
@@ -2107,15 +2150,16 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             if x["id"] in seen: continue
             seen.add(x["id"])
             self.history_list.insert("","end",iid=x["id"],tags=('alternate',) if len(seen)%2==0 else ())
+        self.history_list.selection_set([identifier for identifier in selected if self.history_list.exists(identifier)])
         self.reflow_history_labels()
-        if selected and self.history_list.exists(selected[0]):
-            self.history_list.selection_set(selected[0])
         self.history_button.configure(text=f"草稿簿 · {len(self.saved_history)}")
         count = len(self.deliveries.items) if self.deliveries else 0
         self.delivery_button.configure(text=f"历史 · {count}")
         self.records_button.configure(text='收起记录' if self.history_open else '记录')
         self.history_heading.configure(text='记录')
         self.history_count_var.set(f"{len(items):02d} 条")
+        self.history_multi_button.state(['!disabled'] if items else ['disabled'])
+        self.history_select_all_button.state(['!disabled'] if items else ['disabled'])
         if self.record_mode == "delivery":
             self.history_status.set(self.delivery_error or "记录成功填入的文字、时间与目标窗口；已填入不代表已发送。")
         else:
@@ -2124,7 +2168,8 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
     def reflow_history_labels(self, _event=None):
         # 只重排列表摘要；不重建条目，也不改变选中项、滚动位置或右侧全文。
         font = tkfont.Font(root=self, family=self.fonts.ui, size=self.font_size(10))
-        width = max(80, self.history_list.winfo_width()-32)
+        width = max(80, self.history_list.winfo_width()-32-(24 if self.record_bulk_select else 0))
+        selected = set(self.history_list.selection())
         for item in self.record_items():
             if not self.history_list.exists(item['id']):
                 continue
@@ -2132,7 +2177,8 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             stamp = item['time'][5:16].replace('T', ' ')
             destination = item.get('app', '') if self.record_mode == 'delivery' else f"{len(item['text'])} 字"
             meta = record_excerpt(f'{stamp} · {destination}', width, font.measure, lines=1)
-            self.history_list.item(item['id'], text=excerpt+'\n'+meta)
+            mark = ('☑ ' if item['id'] in selected else '☐ ') if self.record_bulk_select else ''
+            self.history_list.item(item['id'], text=mark+excerpt+'\n'+meta)
 
     def write_history(self, items):
         if not self.require_feature("records"):
@@ -2192,6 +2238,26 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         selected=self.history_list.selection()
         if not selected:
             self.cancel_history()
+            self.reflow_history_labels()
+            return
+        if len(selected) > 1:
+            preview_key = (self.record_mode, tuple(selected))
+            if getattr(self, '_record_preview_key', None) == preview_key:
+                return
+            self._record_preview_key = preview_key
+            self.cancel_delete_history()
+            self.preview_text = None
+            self.preview_widget.configure(state='normal')
+            self.preview_widget.delete('1.0', 'end')
+            self.preview_widget.configure(state='disabled')
+            self.history_empty.configure(text=f'已选 {len(selected)} 条记录\n点击「删除」后确认。')
+            self.history_empty.place(x=8, y=8)
+            for button in (self.history_restore_button, self.history_external_button, self.history_export_button):
+                button.state(['disabled'])
+            self.history_delete_button.state(['!disabled'])
+            self.history_delete_button.configure(text=f'删除 {len(selected)} 条')
+            self.history_status.set(f'已选 {len(selected)} 条{self.record_name}记录；当前正文不会改变。')
+            self.reflow_history_labels()
             return
         item=next((x for x in self.record_items() if x["id"]==selected[0]),None)
         if not item: return
@@ -2212,11 +2278,12 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.history_external_button.state(["!disabled"])
         self.history_export_button.state(["!disabled"])
         self.history_delete_button.state(["!disabled"])
+        self.reflow_history_labels()
 
     def _selected_history_item(self):
         """返回当前历史项；导出和外部编辑只读取该快照。"""
         selected = self.history_list.selection()
-        if not selected:
+        if len(selected) != 1:
             return None
         return next((x for x in self.record_items() if x["id"] == selected[0]), None)
 
@@ -2287,6 +2354,7 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.preview_widget.configure(state="normal")
         self.preview_widget.delete("1.0","end")
         self.preview_widget.configure(state="disabled")
+        self.history_empty.configure(text='选择一条记录，查看全文')
         self.history_empty.place(x=8,y=8)
         selected=self.history_list.selection()
         if selected: self.history_list.selection_remove(*selected)
@@ -2299,16 +2367,18 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         if self.busy: return
         selected = self.history_list.selection()
         if not selected: return
-        if self.pending_delete == selected[0]:
+        request = (self.record_mode, frozenset(selected))
+        if self.pending_delete == request:
             return self.confirm_delete_history()
-        self.pending_delete = selected[0]
-        self.history_delete_button.configure(text="确认删除")
+        self.pending_delete = request
+        self.history_delete_button.configure(text=f'确认删除 {len(selected)} 条')
         self.history_delete_cancel.pack(side="left",padx=(0,8))
-        self.history_status.set(f"删除这条{self.record_name}记录？不会影响当前正文；再按「确认删除」完成。")
+        self.history_status.set(f"删除选中的 {len(selected)} 条{self.record_name}记录？不会影响当前正文；再次点击确认删除。")
 
     def cancel_delete_history(self):
         self.pending_delete = None
-        self.history_delete_button.configure(text="删除")
+        count = len(self.history_list.selection())
+        self.history_delete_button.configure(text=f'删除 {count} 条' if count > 1 else '删除')
         self.history_delete_cancel.pack_forget()
 
     def confirm_delete_history(self):
@@ -2316,19 +2386,22 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             return False
         if self.busy or not self.pending_delete: return False
         selected = self.history_list.selection()
-        if not selected or selected[0] != self.pending_delete: return False
-        items = [x for x in self.record_items() if x["id"] != self.pending_delete]
+        if not selected or (self.record_mode, frozenset(selected)) != self.pending_delete: return False
+        identifiers = self.pending_delete[1]
+        items = [x for x in self.record_items() if x["id"] not in identifiers]
         if self.record_mode == "delivery":
             try:
-                self.deliveries.delete(self.pending_delete)
+                self.deliveries.delete_many(identifiers)
             except OSError:
                 self.history_status.set("历史删除失败，原记录保留")
                 return False
             self.refresh_history()
         elif not self.write_history(items):
             return False
+        if self.record_mode == 'notebook' and self.draft_id in identifiers:
+            self.draft_id = None
         self.cancel_history()
-        self.history_status.set(f"已删除 · 剩余 {len(items)} 条{self.record_name}记录")
+        self.history_status.set(f"已删除 {len(identifiers)} 条 · 剩余 {len(items)} 条{self.record_name}记录")
         self.status_var.set(f"已删除选中的{self.record_name}记录，当前正文未改变")
         return True
 

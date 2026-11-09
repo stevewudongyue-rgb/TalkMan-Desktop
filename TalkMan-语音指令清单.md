@@ -1,6 +1,6 @@
 # Talk Man：用语音操作
 
-适用：Desktop 0.1.43／构建 44。[下载新版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.43)。
+适用：Desktop 0.1.44／构建 45。[下载新版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.44)。
 
 **按「指令修改」再说想做什么。下面是例子，不是固定口令。** 自然说法由当前文字模型理解；没听清、指代不明时会在原窗口追问。可以继续说、点选答案，或者说“取消操作”。录音入口仍需按钮或快捷键，不是一直监听的语音助手。
 

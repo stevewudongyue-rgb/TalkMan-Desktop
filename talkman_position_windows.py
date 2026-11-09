@@ -56,12 +56,23 @@ class WindowsInputPositions:
     def input_position_role(self, target, element):
         from talkman_input_positions import main_input_role
         return main_input_role(target, self._current(element, 'CurrentAutomationId', ''),
-                               [self._current(element, 'CurrentName', '')])
+                               [self._current(element, 'CurrentName', '')],
+                               native_class=self._current(element, 'CurrentClassName', ''))
 
     def resolve_main_input(self, target, role=None):
-        choices = [e for e in self.list_input_positions(target, activate=False)
-                   if self.input_position_role(target, e) and
-                   (role is None or self.input_position_role(target, e) == role)]
+        # 后台／最小化的 Electron 窗口可能暂时不暴露 UIA；先恢复窗口再有限重试。
+        # 这里只定位，不写入，不重试粘贴；多个候选始终交还用户决定。
+        choices = []
+        for attempt in range(4):
+            choices = [e for e in self.list_input_positions(target, activate=False)
+                       if self.input_position_role(target, e) and
+                       (role is None or self.input_position_role(target, e) == role)]
+            if choices:
+                break
+            if attempt == 0:
+                self._activate_position_window(target)
+            if attempt < 3:
+                time.sleep(.08)
         if len(choices) != 1:
             raise TargetError('当前对话的主输入框无法唯一确认，请点「输入位置」重新选择。')
         self.validate_input_position(target, choices[0])
@@ -99,7 +110,13 @@ class WindowsInputPositions:
             return True
         target, element = binding
         self.validate_input_position(target, element)
-        return str(self._current(element, 'CurrentAutomationId', '')).casefold() == 'prompt-textarea'
+        role = self.input_position_role(target, element)
+        if role == ('native', 'chatgpt-prosemirror'):
+            # 原生客户端未提供发送语义 ID；只在唯一的编辑器仍是所选框时允许二次下发。
+            choices = [e for e in self.list_input_positions(target, activate=False)
+                       if self.input_position_role(target, e) == role]
+            return len(choices) == 1 and bool(self._uia.CompareElements(choices[0], element))
+        return role == ('id', 'prompt-textarea')
 
     def _bound_input(self, target):
         binding = getattr(self, '_position_binding', None)

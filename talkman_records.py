@@ -87,7 +87,13 @@ class DeliveryHistory:
         return item
 
     def delete(self, identifier):
-        items = [item for item in self.items if item["id"] != identifier]
+        self.delete_many([identifier])
+
+    def delete_many(self, identifiers):
+        selected = set(identifiers)
+        items = [item for item in self.items if item["id"] not in selected]
+        if len(items) == len(self.items):
+            return
         self._replace(items)
         self.items = items
 
@@ -97,7 +103,8 @@ class DeliveryHistory:
                                          prefix="delivery-", suffix=".tmp", delete=False) as stream:
             temporary = Path(stream.name)
             try:
-                for item in items:
+                # 日志按时间从旧到新存储，load 再倒序；删除后重启不能颠倒顺序。
+                for item in reversed(items):
                     stream.write(json.dumps(item, ensure_ascii=False) + "\n")
                 stream.flush()
                 os.fsync(stream.fileno())

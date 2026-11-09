@@ -152,7 +152,8 @@ class TargetSelection:
         if isinstance(role, (list, tuple)) and len(role) == 2:
             from talkman_input_positions import main_input_role
             known = main_input_role(result, role[1] if role[0] == 'id' else '',
-                                    [role[1]] if role[0] == 'label' else [])
+                                    [role[1]] if role[0] == 'label' else [],
+                                    native_class='ProseMirror' if tuple(role) == ('native', 'chatgpt-prosemirror') else '')
             if known == tuple(role):
                 result['input_role'] = list(known)
         return result

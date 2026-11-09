@@ -61,7 +61,7 @@ class RecoveryTests(unittest.TestCase):
 
     def test_multiple_candidates_or_changed_process_never_fallback(self):
         self.choose_main()
-        self.backend.inputs.append('main-second')
+        self.backend.inputs = ['main-new', 'main-second', 'answer']
         self.controller.fill('不应写入', self.callback)
         self.assertEqual(wait_result(self.results)[0], 'error')
         self.backend.inputs.remove('main-second')
@@ -72,6 +72,7 @@ class RecoveryTests(unittest.TestCase):
 
     def test_cancel_during_resolution_cannot_write(self):
         self.choose_main()
+        self.backend.inputs = ['main-rebuilt', 'answer']
         self.backend.resolve_main_input.side_effect = lambda *args: (self.controller.stop_sync(), 'main')[1]
         self.controller.fill('不应写入', self.callback)
         self.assertEqual(wait_result(self.results)[0], 'error')

@@ -3,8 +3,8 @@ import re
 import uuid
 
 
-def main_input_role(target, identifier, labels):
-    """只认可明确的聊天输入语义；不以坐标、序号或泛称 editor 猜测。"""
+def main_input_role(target, identifier, labels, *, native_class=''):
+    """认可聊天输入语义或指定原生应用的编辑器适配；不靠坐标或序号。"""
     from talkman_target import is_agent_window
     if not is_agent_window(target):
         return None
@@ -18,6 +18,13 @@ def main_input_role(target, identifier, labels):
         value = str(label or '').strip().rstrip('…。.').casefold()
         if value in known:
             return ('label', value)
+    # Windows ChatGPT 的编辑器没有 AutomationId，Name 还会随正文变化。
+    # 仅在原生应用身份与编辑器类同时匹配时使用适配器；重建时仍必须唯一。
+    identity = (target.get('identity', '') if isinstance(target, dict)
+                else getattr(target, 'identity', ''))
+    executable = str(identity).replace('\\', '/').rsplit('/', 1)[-1].casefold()
+    if executable == 'chatgpt.exe' and 'prosemirror' in str(native_class).casefold().split():
+        return ('native', 'chatgpt-prosemirror')
     return None
 
 
@@ -171,7 +178,15 @@ class InputPositionsMixin:
                 if role:
                     role = tuple(role)
         resolver = getattr(self.backend, 'resolve_main_input', None)
-        if recover and resolver and (role or auto_main):
+        live_binding = False
+        validator = getattr(self.backend, 'validate_input_position', None)
+        if recover and binding and binding[0].title == target.title and validator:
+            try:
+                validator(target, binding[1])
+                live_binding = True
+            except TargetError:
+                pass
+        if recover and not live_binding and resolver and (role or auto_main):
             try:
                 element = resolver(target, role)
             except TargetError as error:
