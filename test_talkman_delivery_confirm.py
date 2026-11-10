@@ -2,7 +2,8 @@
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 from talkman_target import TargetController, TargetWindow, TargetError
 from test_talkman_target import FakeBackend, wait_result
 
@@ -197,6 +198,81 @@ class DeliveryConfirmTests(unittest.TestCase):
         self.controller._fill(self.callback, '正文', receipt=True, requested_epoch=epoch)
         self.assertEqual(wait_result(self.results)[0], 'error')
         self.assertEqual(self.backend.text, '前后')
+
+
+class WindowsEmptyHintTests(unittest.TestCase):
+    def setUp(self):
+        from talkman_target_windows import WindowsTargetBackend
+        self.folder = tempfile.TemporaryDirectory()
+        self.backend = backend = WindowsTargetBackend()
+        self.target = TargetWindow(11, 42, 'ChatGPT.exe', '测试对话', 'ChatGPT.exe')
+        self.element = SimpleNamespace(CurrentClassName='ProseMirror ProseMirror-focused',
+                                       CurrentName='Work with ChatGPT')
+        self.value = SimpleNamespace(CurrentValue='Work with ChatGPT\n', CurrentIsReadOnly=False)
+        backend.validate_window = Mock(return_value=self.target)
+        backend._find_editable = Mock(return_value=self.element)
+        backend._pattern = Mock(return_value=self.value)
+        backend._is_editable = Mock(return_value=True)
+        backend._is_descendant_of = Mock(return_value=True)
+        backend._window_element = Mock(return_value=object())
+        backend._ensure_uia = Mock(return_value=SimpleNamespace(CompareElements=lambda a, b: a is b))
+        backend.capture_focus = Mock(return_value=None)
+        backend.input_allows_submit = Mock(return_value=True)
+        backend.fill = Mock(side_effect=lambda *args: self._paste_result())
+        backend.send_delivery = Mock(return_value='假回车')
+        self.after = '新正文\n'
+        self.controller = TargetController(Path(self.folder.name), backend=backend)
+        self.controller.select(self.target)
+        self.results = []
+
+    def tearDown(self):
+        self.controller.close()
+        self.folder.cleanup()
+
+    def _paste_result(self):
+        self.value.CurrentValue = self.after
+        return '已填入'
+
+    def fill(self, text='新正文'):
+        with patch('talkman_target.time.sleep'):
+            self.controller.fill_with_receipt(text, lambda *args: self.results.append(args))
+            state, receipt = wait_result(self.results)
+        self.assertEqual(state, 'ok')
+        return receipt
+
+    def test_exact_body_after_known_empty_hint_arms_send_once(self):
+        for hint in ('Work with ChatGPT', 'Work with Codex'):
+            with self.subTest(hint=hint):
+                self.element.CurrentName = hint
+                self.value.CurrentValue = hint + '\n'
+                snapshot = self.backend.capture_delivery_snapshot(self.target)
+                self.assertTrue(snapshot.empty_hint)
+                self.assertEqual(snapshot.before, hint + '\n')
+                with self.assertRaises(TargetError):
+                    self.backend.read_sync(self.target, snapshot.handle)
+                receipt = self.fill()
+                self.assertTrue(receipt.send_token)
+                self.controller.send_filled(receipt.send_token, lambda *args: self.results.append(args))
+                self.assertEqual(wait_result(self.results)[0], 'ok')
+        self.assertEqual(self.backend.fill.call_count, 2)
+        self.assertEqual(self.backend.send_delivery.call_count, 2)
+
+    def test_hint_never_arms_send_on_missing_or_extra_text(self):
+        for after in ('', 'Work with ChatGPT\n', ' 新正文\n', '新正文另加文字\n', '新正文\n\n'):
+            with self.subTest(after=after):
+                self.value.CurrentValue = 'Work with ChatGPT\n'
+                self.after = after
+                self.assertFalse(self.fill().send_token)
+                self.assertIsNone(self.controller._pending_send)
+        self.backend.send_delivery.assert_not_called()
+
+    def test_real_text_matching_hint_requires_full_insertion(self):
+        self.after = 'Work with ChatGPT\n新正文'
+        self.assertTrue(self.fill().send_token)
+        self.element.CurrentName = '别的控件名'
+        self.value.CurrentValue = 'Work with ChatGPT\n'
+        self.after = '新正文\n'
+        self.assertFalse(self.fill().send_token)
 
 
 if __name__ == '__main__': unittest.main()

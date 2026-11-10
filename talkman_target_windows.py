@@ -13,7 +13,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, Iterable, Optional
 
-from talkman_target import TargetError
+from talkman_target import TargetError, SendSnapshot
 
 
 @dataclass(frozen=True)
@@ -531,7 +531,15 @@ class WindowsTargetBackend(WindowsInputPositions):
                 raise TargetError('此输入框不支持后台同步，请关闭同步后使用「填入」。')
         return element, valid.title
 
-    def read_sync(self, window, handle, *, require_write=True):
+    @staticmethod
+    def _known_empty_hint(window, element, value):
+        identity = (str(window.app) + ' ' + str(window.identity)).casefold()
+        return (('chatgpt' in identity or 'codex' in identity)
+                and 'prosemirror' in str(WindowsTargetBackend._current(element, 'CurrentClassName', '')).casefold().split()
+                and value.strip().casefold() in ('work with chatgpt', 'work with codex')
+                and str(WindowsTargetBackend._current(element, 'CurrentName', '')).strip() == value.strip())
+
+    def read_sync(self, window, handle, *, require_write=True, allow_hint_snapshot=False):
         valid = self.validate_window(window)
         element, title = handle
         if (valid is None or valid.title != title or not self._is_editable(element)
@@ -559,12 +567,16 @@ class WindowsTargetBackend(WindowsInputPositions):
             raise TargetError('无法读回目标输入框，同步已暂停。')
         # 部分 ChatGPT 版本把编辑器提示同时暴露为 Name 和 Value。
         # 无法证明它是不是实际正文时停止同步，不能将其拼成前缀，更不能删除目标文字。
-        if ('chatgpt' in (str(valid.app) + ' ' + str(valid.identity)).casefold()
-                and str(self._current(element, 'CurrentClassName', '')).casefold() == 'prosemirror'
-                and value.strip().casefold() == 'work with chatgpt'
-                and str(self._current(element, 'CurrentName', '')).strip() == value.strip()):
-            raise TargetError('目标返回的文字与 ChatGPT 输入提示相同，无法确认实际正文；已暂停同步，请关闭同步后使用「填入 Agent」。')
+        if self._known_empty_hint(valid, element, value) and not allow_hint_snapshot:
+            raise TargetError('目标返回的文字与 ChatGPT／Codex 输入提示相同，无法确认实际正文；已暂停同步，请关闭同步后使用「填入 Agent」。')
         return value if require_write else value.replace('\r\n', '\n')
+
+    def capture_delivery_snapshot(self, window):
+        handle = self.open_delivery(window)
+        before = self.read_sync(window, handle, require_write=False, allow_hint_snapshot=True)
+        hint = self._known_empty_hint(window, handle[0], before)
+        paragraph_end = '\n' if hint and before.endswith('\n') and not before.endswith('\n\n') else ''
+        return SendSnapshot(handle, before, empty_hint=hint, paragraph_end=paragraph_end)
 
     def open_delivery(self, window):
         return self.open_sync(window, require_write=False)

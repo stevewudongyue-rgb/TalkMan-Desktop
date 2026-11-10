@@ -4,14 +4,14 @@
 
 TALKMAN 是 Windows 和 Mac 上的语音预输入工具：说话生成文字，用自然语言修改，检查后填入其他应用的输入框。本仓库公开桌面端完整源码与安装包，采用 [Apache License 2.0](LICENSE)。所有随版本提供的功能均直接开放，无需兑换码或账号激活。
 
-## 下载 · 0.1.45（构建 46）
+## 下载 · 0.1.46（构建 47）
 
 | 电脑 | 下载与运行 |
 |---|---|
-| Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.45/TalkMan-Windows-Portable-0.1.45.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
-| Apple 芯片 Mac | 本轮 0.1.45 安装包待公司 M2 原生编译验证；可按下方说明自行构建。 |
+| Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.46/TalkMan-Windows-Portable-0.1.46.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
+| Apple 芯片 Mac | 本轮 0.1.46 安装包待公司 M2 原生编译验证；可按下方说明自行构建。 |
 
-[本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.45) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
+[本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.46) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
 
 分享下载直接发送本页地址：**https://github.com/stevewudongyue-rgb/TalkMan-Desktop**。下载无需 GitHub 账号。`Code → Download ZIP` 和发布页的 `Source code` 是源码；运行程序请下载上表中的安装包。
 

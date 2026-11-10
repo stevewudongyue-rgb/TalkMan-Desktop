@@ -37,6 +37,14 @@ class FillReceipt:
     send_token: str = ''
 
 
+@dataclass(frozen=True)
+class SendSnapshot:
+    handle: Any
+    before: str
+    empty_hint: bool = False
+    paragraph_end: str = ''
+
+
 class TargetError(RuntimeError):
     """目标选择、重连或投递失败。消息面向中文界面。"""
 
@@ -448,10 +456,14 @@ class TargetController(InputPositionsMixin):
         # 只在粘贴前重新取得快照；尚未写入目标，可以等待其稳定。
         for attempt in range(3):
             try:
-                handle = open_target(target)
-                before = read(target, handle)
-                if isinstance(before, str):
-                    return handle, before
+                capture = getattr(self.backend, 'capture_delivery_snapshot', None)
+                if callable(capture):
+                    snapshot = capture(target)
+                else:
+                    handle = open_target(target)
+                    snapshot = SendSnapshot(handle, read(target, handle))
+                if isinstance(snapshot, SendSnapshot) and isinstance(snapshot.before, str):
+                    return snapshot
             except Exception:
                 pass
             if attempt < 2:
@@ -463,7 +475,7 @@ class TargetController(InputPositionsMixin):
             return ''
         if snapshot is None:
             return ''
-        handle, before = snapshot
+        handle, before = snapshot.handle, snapshot.before
         open_target, read, _send = self._delivery_methods()
         text = text.replace('\r\n', '\n')
         try:
@@ -478,6 +490,13 @@ class TargetController(InputPositionsMixin):
                         after = read(target, handle)
                     except Exception:
                         pass
+                empty_match = (snapshot.empty_hint and bool(text) and after != before
+                               and snapshot.paragraph_end in ('', '\n')
+                               and after in (text, text + snapshot.paragraph_end))
+                if empty_match:
+                    verified = True
+                else:
+                    verified = False
                 if isinstance(after, str) and len(after) == len(before) + len(text):
                     # 允许填在光标处；移除刚插入的完整文本后必须严格等于旧正文。
                     prefix = 0
@@ -490,12 +509,14 @@ class TargetController(InputPositionsMixin):
                     lower = len(before) - suffix
                     start = after.find(text, lower, prefix+len(text)) if lower <= prefix else -1
                     if start >= 0:
-                        token = uuid.uuid4().hex
-                        with self._lock:
-                            if epoch != self._sync_epoch or self._selected != target:
-                                return ''
-                            self._pending_send = (token, epoch, target, handle, after, time.monotonic()+60)
-                        return token
+                        verified = True
+                if verified:
+                    token = uuid.uuid4().hex
+                    with self._lock:
+                        if epoch != self._sync_epoch or self._selected != target:
+                            return ''
+                        self._pending_send = (token, epoch, target, handle, after, time.monotonic()+60)
+                    return token
                 if attempt < 4:
                     time.sleep(.08)
         except Exception:
