@@ -100,6 +100,30 @@ class EditorTests(unittest.TestCase):
         a.redo()
         self.assertEqual(a.current_text(),"帮我把香蕉拿过来")
 
+    def test_long_live_input_can_scroll_without_jumping_back_to_cursor(self):
+        a = self.app
+        a.deiconify()
+        a.geometry('860x620+40+40')
+        a.update()
+        original = ('这是一次较长的语音记录，需要在录入时回看上文。' * 8 + '\n') * 65
+        a.set_text(original)
+        a.text.mark_set('insert', 'end-1c')
+        with patch.object(a, 'focus_displayof', return_value=a.text):
+            self.assertTrue(a.start_voice('insert'))
+        self.emit('partial', '第一句')
+        a.text.yview_moveto(0)
+        a.editor_wheel(SimpleNamespace(state=0, num=None, delta=-120))
+        a.update()
+        top = a.text.index('@0,0')
+        self.assertTrue(a._voice_review_scroll)
+        self.emit('partial', '第一句，第二句')
+        a.update()
+        self.assertEqual(a.text.index('@0,0'), top)
+        self.assertEqual(a.current_text(), original + '第一句，第二句')
+        self.emit('done', '第一句，第二句')
+        self.assertEqual(a.current_text(), original + '第一句，第二句')
+        self.assertEqual(a.text.index('@0,0'), top)
+
     def test_mic_inserts_at_selection_end(self):
         a=self.app
         a.set_text("苹果香蕉")

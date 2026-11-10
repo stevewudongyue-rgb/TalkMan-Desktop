@@ -131,6 +131,41 @@ class DeliveryConfirmTests(unittest.TestCase):
         self.assertEqual(self.backend.sent, 0)
         self.assertEqual([x for x in self.backend.calls if x[0] == 'paste'], [('paste', '正文')])
 
+    def test_recreated_editor_after_fill_and_before_send_is_rechecked(self):
+        generation = [0]
+        def open_delivery(target):
+            return generation[0]
+        def read_delivery(target, handle):
+            if handle != generation[0]:
+                raise TargetError('编辑控件已重建')
+            return self.backend.text
+        def fill(target, text, token):
+            self.backend.calls.append(('paste', text))
+            self.backend.text = self.backend.text[:1] + text + self.backend.text[1:]
+            generation[0] += 1
+            return '已填入'
+        def send_delivery(target, handle, text, current):
+            self.assertEqual(handle, generation[0])
+            self.assertTrue(current())
+            self.backend.sent += 1
+        self.backend.open_delivery = open_delivery
+        self.backend.read_delivery = read_delivery
+        self.backend.send_delivery = send_delivery
+        self.backend.fill = fill
+        receipt = self.fill()
+        generation[0] += 1
+        self.controller.send_filled(receipt.send_token, self.callback)
+        self.assertEqual(wait_result(self.results)[0], 'ok')
+        self.assertEqual(self.backend.sent, 1)
+        self.assertEqual([x for x in self.backend.calls if x[0] == 'paste'], [('paste', '正文')])
+
+    def test_recreated_editor_with_changed_text_never_sends(self):
+        receipt = self.fill()
+        self.backend.text += '目标中又有新字'
+        self.controller.send_filled(receipt.send_token, self.callback)
+        self.assertEqual(wait_result(self.results)[0], 'error')
+        self.assertEqual(self.backend.sent, 0)
+
     def test_permanently_changed_editor_after_paste_never_arms_send(self):
         read = self.backend.read_sync
         def changed(target, handle):

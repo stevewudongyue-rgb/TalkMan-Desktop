@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import tkinter as tk
+import sys
 from tkinter import font as tkfont
 from typing import Callable, Mapping
 
@@ -120,6 +121,8 @@ class TextMagnifier:
                 self.window.withdraw()
                 self.window.overrideredirect(True)
                 self.window.transient(self.text.winfo_toplevel())
+                if sys.platform == 'win32':
+                    self.window.attributes('-topmost', True)
                 self.canvas = tk.Canvas(self.window, takefocus=False, borderwidth=0,
                                         highlightthickness=1)
                 self.canvas.pack(fill="both", expand=True)

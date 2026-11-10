@@ -414,8 +414,16 @@ class TargetController(InputPositionsMixin):
             def current():
                 return (not self._stop.is_set() and epoch == self._sync_epoch
                         and time.monotonic() < expires and self._selected == target)
-            _open, read, send = self._delivery_methods()
-            if not current() or read(target, handle) != expected:
+            open_target, read, send = self._delivery_methods()
+            if not current():
+                raise TargetError('目标、文字或确认时间已变化，本次未下发；请检查目标输入框。')
+            try:
+                actual = read(target, handle)
+            except Exception:
+                # 目标编辑控件可能在 TalkMan 重新获得焦点时重建；仍须逐字核对。
+                handle = open_target(target)
+                actual = read(target, handle)
+            if not current() or actual != expected:
                 raise TargetError('目标、文字或确认时间已变化，本次未下发；请检查目标输入框。')
             send(target, handle, expected, current)
             result = FillReceipt('已向目标按下回车，请在目标确认发送结果。', expected, target.app, target.title,
@@ -456,15 +464,20 @@ class TargetController(InputPositionsMixin):
         if snapshot is None:
             return ''
         handle, before = snapshot
-        _open, read, _send = self._delivery_methods()
+        open_target, read, _send = self._delivery_methods()
         text = text.replace('\r\n', '\n')
         try:
             for attempt in range(5):
                 try:
                     after = read(target, handle)
                 except Exception:
-                    # 读回短暂失败也参与有限重试；不重新粘贴、不更换原控件快照。
+                    # 填入后控件重建时，只重新定位同一目标的主编辑框，不重复粘贴。
                     after = None
+                    try:
+                        handle = open_target(target)
+                        after = read(target, handle)
+                    except Exception:
+                        pass
                 if isinstance(after, str) and len(after) == len(before) + len(text):
                     # 允许填在光标处；移除刚插入的完整文本后必须严格等于旧正文。
                     prefix = 0

@@ -15,6 +15,7 @@ class RuledText(tk.Text):
         self._delivery_fit_hold = False
         self._fit_resume_job = None
         self._fit_key = None
+        self._fit_revision = 0
         kwargs.update(borderwidth=0, relief="flat", highlightthickness=1)
         # 自动换行之间留出细线的空间，不让横线压到字母下伸部。
         kwargs.setdefault("spacing2", 4)
@@ -33,16 +34,20 @@ class RuledText(tk.Text):
         self._original_command = self._w + "_ruled_original"
         self.tk.call("rename", self._w, self._original_command)
         self._notify_command = self._register(self._schedule_redraw)
+        self._content_command = self._register(self._content_changed)
         # 原生类绑定会 catch sel.first 等不存在选区的错误；不能让它穿过 Python 回调。
         # Tcl 保留完整 return options，Python 只接收成功操作后的无参数刷新通知。
         dispatch = self.tk.call("format", """
             set code [catch [linsert $args 0 %s] result options]
             if {$code != 0} {return -options $options $result}
+            if {[lindex $args 0] in {insert delete replace} ||
+                ([lindex $args 0] eq "edit" && [lindex $args 1] in {undo redo})} {%s}
             if {[lindex $args 0] in {insert delete replace configure tag mark yview xview see scan edit}} {
                 %s
             }
             return $result
-        """, self.tk.call("list", self._original_command), self.tk.call("list", self._notify_command))
+        """, self.tk.call("list", self._original_command), self.tk.call("list", self._content_command),
+            self.tk.call("list", self._notify_command))
         self.tk.call("proc", self._w, "args", dispatch)
         # 子装饰的隐藏/显示会产生 Expose；监听它会造成光标重绘的无限 idle 循环。
         for event in ("<Configure>", "<<ThemeChanged>>"):
@@ -91,6 +96,9 @@ class RuledText(tk.Text):
         if not self._editor_destroying and self._redraw_job is None:
             self._redraw_job = self.after_idle(self._redraw)
 
+    def _content_changed(self):
+        self._fit_revision += 1
+
     def _pixels(self, option):
         return self.winfo_pixels(self.cget(option))
 
@@ -103,13 +111,19 @@ class RuledText(tk.Text):
     def _fit_content(self):
         if not self._auto_fit or self._fit_paused or self._delivery_fit_hold:
             return
-        key = (self.winfo_width(), self.winfo_height(), self.get('1.0', 'end-1c'))
+        key = (self.winfo_width(), self.winfo_height(), self._fit_revision)
         if key == self._fit_key:
             return
         self._fit_key = key
         height = self.winfo_height() - 2 * (self._pixels('pady') +
             self._pixels('highlightthickness') + self._pixels('borderwidth'))
         if height <= 0:
+            return
+        # 超过小窗可容纳的文本量后直接用最小字号；完整排版测量会阻塞主线程。
+        count = self.count('1.0', 'end-1c', 'chars')
+        if count and count[0] > 12000:
+            self._fit_font.configure(size=self._fit_sizes[-1])
+            self.tk.call(self._original_command, 'configure', '-font', str(self._fit_font))
             return
         # 在原生控件内精确测量自动折行。临时关闭滚动回调，避免试算字号时闪动滚动条。
         callback = self.cget('yscrollcommand')

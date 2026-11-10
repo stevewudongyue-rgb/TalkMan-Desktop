@@ -1048,10 +1048,10 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             return self.focus_at_pointer()
 
     def editor_wheel(self, event):
-        if self.busy or self.closing or self._mic_permission_pending:
+        if self.closing or self._mic_permission_pending:
             self._wheel_remainder = 0
             return "break"
-        if self.history_open or self.focus_get() != self.text:
+        if self.history_open or (not self.busy and self.focus_get() != self.text):
             self._wheel_remainder = 0
             return None
         state = int(getattr(event, "state", 0))
@@ -1062,6 +1062,11 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         number = getattr(event, "num", None)
         raw = 120 if number == 4 else -120 if number == 5 else int(getattr(event, "delta", 0))
         if not raw:
+            return "break"
+        if self.busy:
+            self._voice_review_scroll = True
+            units = max(1, abs(raw) // 120) if sys.platform != 'darwin' else max(1, abs(raw))
+            self.text.yview_scroll((-1 if raw > 0 else 1) * units * 3, "units")
             return "break"
         if state & 1:
             self._wheel_remainder = 0
@@ -1302,20 +1307,21 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.refresh_translation_controls()
         if hasattr(self, 'live_sync'):
             self.live_sync.changed()
-        self.count_var.set(f"{len(self.current_text())} 字")
+        value = self.current_text()
+        self.count_var.set(f"{len(value)} 字")
         if hasattr(self,"empty_hint"):
-            if self.current_text() or self.busy:
+            if value or self.busy:
                 self.empty_hint.place_forget()
             else:
                 self.empty_hint.place(in_=self.editor_hint_line, x=16, y=0, anchor="w")
         sel = self.get_selection()
-        if not self.busy and self.learning_pending is None and self.current_text() == self.learning_baseline:
+        if not self.busy and self.learning_pending is None and value == self.learning_baseline:
             self.learning_selected = (len(self.text.get('1.0', sel[0])), len(self.text.get('1.0', sel[1]))) if sel else None
         if sel:
             self.cancel_auto_timer()
         if hasattr(self, 'remember_button'):
             self.remember_button.state(['!disabled'] if sel and 0 < len(sel[2]) <= 80 and '\n' not in sel[2] and not self.busy and self.ai_review is None else ['disabled'])
-        self.clear_button.state(["!disabled"] if self.current_text() and not self.busy else ["disabled"])
+        self.clear_button.state(["!disabled"] if value and not self.busy else ["disabled"])
         selection_cleared = self._had_selection and not sel
         self._had_selection = bool(sel)
         self.selection_var.set(
@@ -1332,8 +1338,9 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         r = self.text.tag_ranges("sel")
         return (str(r[0]),str(r[1]),self.text.get(r[0],r[1])) if r else None
 
-    def render_text(self, value, cursor=None, live=None, selection=None):
+    def render_text(self, value, cursor=None, live=None, selection=None, preserve_view=False):
         self.reset_manual_learning(value)
+        reading_at = self.text.index('@0,0') if preserve_view else None
         self.text.configure(state="normal")
         self.text.delete("1.0","end")
         self.text.insert("1.0",value)
@@ -1342,7 +1349,10 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             return f"1.0 + {offset} chars"
         if cursor is not None:
             self.text.mark_set("insert",index(cursor))
-            self.text.see("insert")
+            if reading_at is None:
+                self.text.see("insert")
+        if reading_at is not None:
+            self.text.yview(reading_at)
         if live:
             self.text.tag_add("live",index(live[0]),index(live[1]))
         if selection and selection[1] > selection[0]:
@@ -1351,6 +1361,26 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             self.emphasize_voice_range(*live)
         self.text.edit_modified(False)
         self.text.configure(state="disabled" if self.busy else "normal")
+        self.update_meta()
+
+    def render_voice_preview(self, value, previous):
+        start = f"1.0 + {self.voice_start} chars"
+        end = f"1.0 + {self.voice_start + len(previous) if previous else self.voice_end} chars"
+        reading_at = self.text.index('@0,0') if self._voice_review_scroll else None
+        self.text.configure(state='normal')
+        self.text.replace(start, end, value)
+        cursor = f"1.0 + {self.voice_start + len(value)} chars"
+        self.text.mark_set('insert', cursor)
+        self.text.tag_remove('live', '1.0', 'end')
+        if value:
+            self.text.tag_add('live', start, cursor)
+        self.emphasize_voice_range(self.voice_start, self.voice_start + len(value))
+        if reading_at is not None:
+            self.text.yview(reading_at)
+        else:
+            self.text.see('insert')
+        self.text.edit_modified(False)
+        self.text.configure(state='disabled')
         self.update_meta()
 
     def on_text_modified(self,_event=None):
@@ -1828,6 +1858,7 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.voice_end=end
         self.voice_mode=mode
         self.voice_text=""
+        self._voice_review_scroll = False
         self.voice_stopping=False
         self.operation_id += 1
         token=self.operation_id
@@ -1869,13 +1900,13 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
             self.voice.stop()
 
     def show_voice_text(self,value):
+        previous = self.voice_text
         self.voice_text=value
         self.window_controller.voice_progress(value)
         if self.voice_mode == "rewrite":
             self.status_var.set("听到指令："+value[-100:])
         else:
-            s,e=self.voice_start,self.voice_end
-            self.render_text(self.voice_base[:s]+value+self.voice_base[e:],s+len(value),(s,s+len(value)))
+            self.render_voice_preview(value, previous)
 
     def finish_voice(self,value):
         self.window_controller.voice_progress(value)
@@ -1956,7 +1987,8 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.set_busy(False)
         self.timeline.commit(new)
         self.revision+=1
-        self.render_text(new,cursor,selection=(self.voice_start,cursor) if keep_selection else None)
+        self.render_text(new,cursor,selection=(self.voice_start,cursor) if keep_selection else None,
+                         preserve_view=self._voice_review_scroll)
         self.status_var.set("已按指令修改，可用「上一步」撤销" if keep_selection else
                             "已写入，光标停在新文字末尾；可用「上一步」撤销")
         self.schedule_auto()
@@ -1971,7 +2003,8 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
         self.voice_mode=None
         self.operation_id+=1
         self.set_busy(False)
-        self.render_text(self.voice_base,self.voice_start,selection=self.voice_selection)
+        self.render_text(self.voice_base,self.voice_start,selection=self.voice_selection,
+                         preserve_view=self._voice_review_scroll)
         self.status_var.set(message)
 
     def cancel_operation(self):

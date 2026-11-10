@@ -1,5 +1,6 @@
 """验证真实 Tk 文字放大镜不干扰正文、焦点和选区。"""
 import tkinter as tk
+import sys
 import unittest
 from types import SimpleNamespace
 
@@ -69,6 +70,12 @@ class MagnifierTests(unittest.TestCase):
                  self.text.cget("cursor"))
         self.assertEqual(before, after)
         self.assertIsNone(self.root.grab_current())
+
+    def test_lens_stays_above_other_windows_on_windows(self):
+        self.root.attributes('-topmost', True)
+        self.hover()
+        if sys.platform == 'win32':
+            self.assertTrue(self.lens.window.attributes('-topmost'))
 
     def test_click_suppresses_until_leave_and_keeps_existing_bindings(self):
         clicks = []

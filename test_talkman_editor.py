@@ -259,6 +259,18 @@ class RuledEditorTests(unittest.TestCase):
         self.root.update()
         self.assertEqual(tkfont.Font(text, font=text.cget('font')).actual('size'), 14)
 
+    def test_long_document_skips_full_layout_fit_and_scroll_does_not_refit(self):
+        text = self.text
+        text._auto_fit = True
+        text.insert('1.0', ('长文编辑与滚动。' * 24 + '\n') * 75)
+        self.root.update()
+        self.assertEqual(tkfont.Font(text, font=text.cget('font')).actual('size'), 14)
+        with patch.object(text, '_fit_content', wraps=text._fit_content) as fit:
+            text.yview_moveto(.5)
+            self.root.update()
+            self.assertLessEqual(fit.call_count, 1)
+        self.assertGreater(text.yview()[0], 0)
+
 
 if __name__ == "__main__":
     unittest.main()
