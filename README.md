@@ -9,7 +9,7 @@ TALKMAN 是 Windows 和 Mac 上的语音预输入工具：说话生成文字，�
 | 电脑 | 下载与运行 |
 |---|---|
 | Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.46/TalkMan-Windows-Portable-0.1.46.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
-| Apple 芯片 Mac | 本轮 0.1.46 安装包待公司 M2 原生编译验证；可按下方说明自行构建。 |
+| Apple 芯片 Mac | **[下载 Apple Silicon 测试版 DMG](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.46/TalkMan-Mac-AppleSilicon-0.1.46.dmg)**。此包由 GitHub Apple Silicon 环境构建并通过 DMG／代码签名结构校验，尚未 Apple 公证或在公司 M2 上完成实际录音、权限与升级验收。 |
 
 [本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.46) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
 
