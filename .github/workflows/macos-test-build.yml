@@ -1,0 +1,43 @@
+name: Mac Apple Silicon test build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          architecture: arm64
+      - name: Check native build environment
+        run: |
+          test "$(uname -m)" = arm64
+          python3 TalkMan-构建Mac.py --check
+      - name: Build unsigned test image
+        run: python3 TalkMan-构建Mac.py --test-dmg
+      - name: Verify image and app metadata
+        run: |
+          hdiutil verify dist-mac/TalkMan-Mac-AppleSilicon-测试版.dmg
+          codesign --verify --deep --strict dist-mac/TalkMan.app
+          python3 - <<'PY'
+          import plistlib
+          from pathlib import Path
+          from talkman_version import VERSION
+
+          with (Path('dist-mac/TalkMan.app/Contents/Info.plist')).open('rb') as stream:
+              info = plistlib.load(stream)
+          assert info['CFBundleIdentifier'] == 'com.cololight.talkman'
+          assert info['CFBundleShortVersionString'] == VERSION
+          print(f'Mac app version: {VERSION}')
+          PY
+          shasum -a 256 dist-mac/TalkMan-Mac-AppleSilicon-测试版.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TalkMan-Mac-AppleSilicon-test-dmg
+          path: dist-mac/TalkMan-Mac-AppleSilicon-测试版.dmg
+          if-no-files-found: error
