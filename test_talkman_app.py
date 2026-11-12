@@ -658,9 +658,6 @@ class EditorTests(unittest.TestCase):
                         for page_name, page in a.settings_tabs.items():
                             a.settings_notebook.select(page)
                             window.update()
-                            if page_name == 'about' and not a.license_code_form.winfo_manager():
-                                a.license_change_button.invoke()
-                                window.update()
                             check_controls(page, window)
                             if page_name == "asr":
                                 for provider in PROVIDERS.values():

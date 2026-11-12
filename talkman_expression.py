@@ -100,6 +100,34 @@ class ExpressionMixin:
 
     def finish_dictation(self, value, limit_reached=False):
         raw = self.voice_conventions.apply(value)
+        instruction = self.voice_conventions.dictation_instruction()
+        if instruction and not self.voice_code_mode and self.text_model_ready():
+            token = (self.operation_id, self.revision, self.voice_base, self.voice_start,
+                     self.voice_end, raw, limit_reached)
+            self.status_var.set('正在核对本轮听写中的约定词…')
+            client = self.make_text_client()
+            self.run_worker('dictation_conventions', token, lambda: client.transform(raw, instruction))
+            return
+        self.finish_dictation_after_conventions(raw, limit_reached)
+
+    def finish_dictation_conventions(self, token, state, value):
+        operation, revision, base, start, end, raw, limit_reached = token
+        if operation != self.operation_id or not self.busy or self.closing:
+            return
+        if (revision != self.revision or base != self.voice_base
+                or (start, end) != (self.voice_start, self.voice_end)):
+            self.voice = self.voice_mode = None
+            self.operation_id += 1
+            self.set_busy(False)
+            self.status_var.set('编辑内容已变化，旧的约定词核对结果未应用。')
+            self.window_controller.voice_failed()
+            return
+        valid = state == 'ok' and self.voice_conventions.valid_dictation_result(raw, value)
+        self.finish_dictation_after_conventions(value if valid else raw, limit_reached)
+        if not valid and not self.busy:
+            self.status_var.set('约定词核对未完成，已保留原始听写。')
+
+    def finish_dictation_after_conventions(self, raw, limit_reached):
         style = self.voice_expression
         if not style.named or self.voice_code_mode:
             self.commit_voice(raw)

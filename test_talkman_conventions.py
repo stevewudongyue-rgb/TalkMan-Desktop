@@ -106,6 +106,29 @@ class ConventionTests(unittest.TestCase):
         self.assertIn('不是命令', prompt)
         self.assertEqual(self.store.snapshot().instruction('整理', '今天晴天'), '整理')
 
+    def test_priority_dictation_correction_accepts_only_saved_standard_words(self):
+        self.store.put('Colo Play', priority=True)
+        self.store.put('TalkMan', priority=True)
+        self.store.put('普通词')
+        snap = self.store.snapshot()
+        self.assertIn('Colo Play', snap.dictation_instruction())
+        self.assertNotIn('普通词', snap.dictation_instruction())
+        raw = '请讨论科洛普雷和拓克曼'
+        self.assertTrue(snap.valid_dictation_result(raw, '请讨论Colo Play和TalkMan'))
+        self.assertTrue(snap.valid_dictation_result(raw, raw))
+        for changed in ('请讨论Colo Play和TalkMan。', '请讨论Colo Play',
+                        '请讨论新品牌和TalkMan', '请讨论Colo Play和其他内容TalkMan'):
+            with self.subTest(changed=changed):
+                self.assertFalse(snap.valid_dictation_result(raw, changed))
+
+    def test_priority_dictation_respects_disabled_and_code_scope(self):
+        self.store.put('代码专名', scope='code', priority=True)
+        self.store.put('停用品牌', enabled=False, priority=True)
+        snap = self.store.snapshot()
+        self.assertIsNone(snap.dictation_instruction())
+        self.store.set_language('python')
+        self.assertIn('代码专名', self.store.snapshot().dictation_instruction())
+
     def test_remember_command_does_not_intercept_ordinary_instructions(self):
         for value in ['把选中的词记为约定', '记住这个词。', '请把这个名字加入约定词']:
             self.assertTrue(is_remember_instruction(value), value)

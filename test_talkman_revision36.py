@@ -83,7 +83,7 @@ class Desktop36Tests(unittest.TestCase):
             a.update()
             self.assertEqual(geometry(), before, f'录音结束 {width}')
 
-    def test_priority_is_sent_to_actual_text_client_and_is_license_gated(self):
+    def test_priority_is_sent_to_actual_text_client_in_open_source_version(self):
         a = self.app
         a.settings = QwenSettings(api_key='sk-offline-test')
         a.conventions.put('Colo Play', priority=True)
@@ -95,7 +95,7 @@ class Desktop36Tests(unittest.TestCase):
         self.assertIn('Colo Play', client.transform.call_args.args[1])
         self.assertEqual(client.transform.call_args.args[0], '讨论科洛普雷')
         with patch.object(a, 'has_feature', return_value=False):
-            self.assertNotIn('Colo Play', a.ai_instruction(once=True))
+            self.assertIn('Colo Play', a.ai_instruction(once=True))
         a.auto_running = False
 
     def test_priority_command_requires_confirmation(self):

@@ -2090,6 +2090,8 @@ class TalkManApp(LicenseUIMixin, TranslationUIMixin, DeliveryUIMixin, Convention
                 else: self.restore_voice(value+"；原文已保留")
             elif kind == 'speech_expression':
                 self.finish_speech_expression(token, state, value)
+            elif kind == 'dictation_conventions':
+                self.finish_dictation_conventions(token, state, value)
             elif kind == "ai_once":
                 self._finish_ai(token, state, value, once=True)
             elif kind == 'translation':

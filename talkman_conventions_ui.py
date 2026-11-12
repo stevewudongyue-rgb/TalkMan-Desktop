@@ -141,8 +141,8 @@ class ConventionsUIMixin:
         ttk.Combobox(row, textvariable=values['scope'], values=tuple(SCOPES.values()),
                      state='readonly', width=14).pack(side='left')
         ttk.Checkbutton(row, text='启用', variable=values['enabled']).pack(side='right')
-        ttk.Checkbutton(parent, text='AI 整理时优先用这个词', variable=values['priority']).pack(anchor='w', pady=(12, 4))
-        ttk.Label(parent, text='不填误写也可用。自动整理或点“AI 整理一次”时参考，结合上下文判断。',
+        ttk.Checkbutton(parent, text='录音后优先核对这个词', variable=values['priority']).pack(anchor='w', pady=(12, 4))
+        ttk.Label(parent, text='不填误写也可用。连接文字模型后，录音结束时核对新误写；AI 整理时也会参考。',
                   style='Muted.TLabel', wraplength=340).pack(anchor='w')
         return values
 
@@ -202,7 +202,7 @@ class ConventionsUIMixin:
             aliases='，'.join(aliases[:12]), scope=existing['scope'] if existing else 'all',
             enabled=existing['enabled'] if existing else True, priority=existing.get('priority', False) if existing else True)
         hint = ('已带入近期纠正过的误写，可删改；保存才生效。' if observed else
-                '误写可留空。勾选优先用词，AI 整理时会参考正确写法。')
+                '误写可留空。勾选优先用词后，录音结束时会用文字模型核对。')
         feedback = tk.StringVar(value=self.conventions.error or hint)
         self.term_feedback = feedback
         ttk.Label(body, textvariable=feedback, style='Muted.TLabel', wraplength=390).pack(fill='x', pady=10)
@@ -260,7 +260,7 @@ class ConventionsUIMixin:
             self.license_placeholder(box, "记住品牌名、口述代码，并从近期纠正中学习用词。")
             return
         self._settings_description(box, '让 Talk Man 记住你的用词', '选词后点「记住这个词」，确认误写即可；近期反复纠正也会提醒你。')
-        feedback = tk.StringVar(value=self.conventions.error or '已知误写会直接纠正；优先词会提供给当前文字模型，由 AI 结合上下文判断。')
+        feedback = tk.StringVar(value=self.conventions.error or '已知误写直接纠正；优先词在录音结束时由文字模型核对新误写。')
         learning_row = ttk.Frame(box)
         learning_row.pack(fill='x', pady=(0, 6))
         learning = tk.BooleanVar(value=self.correction_memory.enabled)
