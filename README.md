@@ -4,14 +4,14 @@
 
 TALKMAN 是 Windows 和 Mac 上的语音预输入工具：说话生成文字，用自然语言修改，检查后填入其他应用的输入框。本仓库公开桌面端完整源码与安装包，采用 [Apache License 2.0](LICENSE)。所有随版本提供的功能均直接开放，无需兑换码或账号激活。
 
-## 下载 · 0.1.46（构建 47）
+## 下载 · 0.1.47（构建 48）
 
 | 电脑 | 下载与运行 |
 |---|---|
-| Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.46/TalkMan-Windows-Portable-0.1.46.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
-| Apple 芯片 Mac | **[下载 Apple Silicon 测试版 DMG](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.46/TalkMan-Mac-AppleSilicon-0.1.46.dmg)**。此包由 GitHub Apple Silicon 环境构建并通过 DMG／代码签名结构校验，尚未 Apple 公证或在公司 M2 上完成实际录音、权限与升级验收。 |
+| Windows 10／11，64 位 | **[下载 Windows 便携版](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.47/TalkMan-Windows-Portable-0.1.47.zip)**。完整解压后运行 `TalkMan/TalkMan.exe`，保留相邻的 `_internal` 文件夹。 |
+| Apple 芯片 Mac | **[下载 Apple Silicon 测试版 DMG](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/download/v0.1.47/TalkMan-Mac-AppleSilicon-0.1.47.dmg)**。此包由 GitHub Apple Silicon 环境构建并通过 DMG／代码签名结构校验，尚未 Apple 公证或在公司 M2 上完成实际录音、权限与升级验收。 |
 
-[本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.46) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
+[本次发布与附件](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases/tag/v0.1.47) · [全部版本](https://github.com/stevewudongyue-rgb/TalkMan-Desktop/releases) · [版本记录](TalkMan-版本记录.md)
 
 分享下载直接发送本页地址：**https://github.com/stevewudongyue-rgb/TalkMan-Desktop**。下载无需 GitHub 账号。`Code → Download ZIP` 和发布页的 `Source code` 是源码；运行程序请下载上表中的安装包。
 
@@ -20,7 +20,7 @@ TALKMAN 是 Windows 和 Mac 上的语音预输入工具：说话生成文字，�
 - **录音和覆盖：** 没有选区就在光标处输入，有选区就替换所选文字。支持点按启停、按住录音和自定义快捷键。
 - **语音指令：** 说“把这句改得简短一些”“把这一段移到最后”，也可保存草稿、切换 AI 设置或记住约定词。需要确认时，在原窗口继续选择或回答。
 - **AI 整理与翻译：** 去语气词、补标点、分行、理顺语序；可先看改写对照，确认后应用。翻译只处理选中文字。
-- **草稿、历史和约定词：** 保存文本、查看投递记录、导出 TXT；通过「多选 → 勾选／全选 → 删除 → 确认」批量清理。记住专名及容易听错的词。
+- **草稿、历史和约定词：** 保存文本、查看投递记录、导出 TXT；通过「多选 → 勾选／全选 → 删除 → 确认」批量清理。记住专名及容易听错的词；启用优先核对后，录音结束时检查新的误写。
 - **填入 Agent：** 选择目标窗口后，把文字放进它的输入框。确认填入成功后，再点“下发”才发送；无法核对时保留正文。支持窗口置顶、边缘收起和快捷唤起。
 
 详细操作及自然说法见 [语音指令清单](TalkMan-语音指令清单.md)。不同应用的输入框兼容性可能不同。
